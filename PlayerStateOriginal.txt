@@ -1,0 +1,182 @@
+using UnityEngine;
+
+public class PlayerControlState : MonoBehaviour
+{
+    public int actionsPlayer;
+    public GameObject playerGame;
+    public Animator playerAnimator;
+    private bool animatorActionExecuted = false;
+
+    private GameObject alcapaoObject;
+    private GameObject alcapaoEsquerdoObject;
+
+
+    public CharacterController playerInTrans;
+    public CapsuleCollider playerCol;
+
+    public GameObject playerGameObject;//invisivel
+
+    public Camera mainCamera;
+    private string playerLayerName = "Player";
+    private int playerLayerMask;
+
+
+
+    void Start()
+    {
+        actionsPlayer = 0;
+
+        alcapaoObject = GameObject.FindGameObjectWithTag("AlcapaoFrontal");
+        if (alcapaoObject == null) Debug.LogError("AlcapaoFrontal não encontrado!");
+
+        alcapaoEsquerdoObject = GameObject.FindGameObjectWithTag("AlcapaoEsquerdo");
+        if (alcapaoEsquerdoObject == null) Debug.LogError("AlcapaoEsquerdo não encontrado!");
+
+        // Obtém a máscara de bits da Layer do Player
+        playerLayerMask = LayerMask.GetMask(playerLayerName);
+
+        // Verificação importante para garantir que a câmera foi atribuída no Inspector
+        if (mainCamera == null)
+        {
+            Debug.LogError("A câmera principal não foi referenciada no Inspector do GameManager!");
+        }
+
+
+    }
+
+    void Update()
+    {
+        if (actionsPlayer == 0 && animatorActionExecuted == false)
+        {
+            
+           CameraSegue.target = CameraSegue.CameraTarget.Player;
+            PlayerVida.tranco = true;
+            playerGame.GetComponent<CharacterController>().enabled = true;
+            playerCol.GetComponent<CapsuleCollider>().enabled = true;
+
+            playerGame.GetComponent<PlayerController>().enabled = true;
+            playerGame.GetComponent<PlayerOnLadder>().enabled = false;
+            playerGame.GetComponent<PlayerOnLadderEsquerdo>().enabled = false;
+
+            playerAnimator.Rebind();
+            playerAnimator.Update(0f);                    
+
+
+            if (alcapaoObject != null) alcapaoObject.SetActive(true);
+            if (alcapaoEsquerdoObject != null) alcapaoEsquerdoObject.SetActive(true);
+
+            SetPlayerVisible();
+            animatorActionExecuted = true;
+        }
+
+
+
+
+
+        if (actionsPlayer == 1)
+        {
+            playerGame.GetComponent<CharacterController>().enabled = true;
+            playerCol.GetComponent<CapsuleCollider>().enabled = true;
+
+            playerGame.GetComponent<PlayerController>().enabled = false;
+            playerGame.GetComponent<PlayerOnLadder>().enabled = true;
+            playerGame.GetComponent<PlayerOnLadderEsquerdo>().enabled = false;
+
+            if (alcapaoObject != null) alcapaoObject.SetActive(false);
+            if (alcapaoEsquerdoObject != null) alcapaoEsquerdoObject.SetActive(false);
+            animatorActionExecuted = false;
+        }
+
+        if (actionsPlayer == 2)
+        {
+            playerGame.GetComponent<CharacterController>().enabled = true;
+            playerCol.GetComponent<CapsuleCollider>().enabled = true;
+
+            playerGame.GetComponent<PlayerController>().enabled = false;
+            playerGame.GetComponent<PlayerOnLadder>().enabled = false;
+            playerGame.GetComponent<PlayerOnLadderEsquerdo>().enabled = true;
+
+            if (alcapaoObject != null) alcapaoObject.SetActive(false);
+            if (alcapaoEsquerdoObject != null) alcapaoEsquerdoObject.SetActive(false);
+            animatorActionExecuted = false;
+
+        }
+
+        if (actionsPlayer == 3)
+        {
+            //escada direita
+        }
+
+        if (actionsPlayer == 4) //segue transporte
+        {
+            playerGame.GetComponent<CharacterController>().enabled = false;
+            playerCol.GetComponent<CapsuleCollider>().enabled = false;
+
+            playerGame.GetComponent<PlayerController>().enabled = false;
+            playerGame.GetComponent<PlayerOnLadder>().enabled = false;
+            playerGame.GetComponent<PlayerOnLadderEsquerdo>().enabled = false;
+            SetPlayerInvisible();
+            animatorActionExecuted = false;
+        }
+
+
+
+
+        if (actionsPlayer == 9) //segue transporte
+        {
+            playerGame.GetComponent<CharacterController>().enabled = false;
+            playerCol.GetComponent<CapsuleCollider>().enabled = false;
+
+            playerGame.GetComponent<PlayerController>().enabled = false;
+            playerGame.GetComponent<PlayerOnLadder>().enabled = false;
+            playerGame.GetComponent<PlayerOnLadderEsquerdo>().enabled = false;            
+            animatorActionExecuted = false;
+        }
+
+
+
+        if (actionsPlayer == 10) //GameOver
+        {
+            playerGame.GetComponent<CharacterController>().enabled = true;
+            playerCol.GetComponent<CapsuleCollider>().enabled = false;
+
+            playerGame.GetComponent<PlayerController>().enabled = false;
+            playerGame.GetComponent<PlayerOnLadder>().enabled = false;
+            playerGame.GetComponent<PlayerOnLadderEsquerdo>().enabled = false;
+
+            animatorActionExecuted = false;
+
+
+        }
+
+
+
+
+    }
+    public void SetPlayerInvisible()
+    {
+        if (mainCamera != null)
+        {
+            // Remove a Layer do Player da Culling Mask da câmera principal usando um bitwise NOT
+            mainCamera.cullingMask &= ~playerLayerMask;
+        }
+        else
+        {
+            Debug.LogError("A câmera principal é nula. Certifique-se de referenciá-la no Inspector.");
+        }
+    }
+
+    // Função para tornar o Player visível novamente para a câmera principal
+    public void SetPlayerVisible()
+    {
+        if (mainCamera != null)
+        {
+            // Adiciona a Layer do Player de volta à Culling Mask da câmera principal usando um bitwise OR
+            mainCamera.cullingMask |= playerLayerMask;
+        }
+        else
+        {
+            Debug.LogError("A câmera principal é nula. Certifique-se de referenciá-la no Inspector.");
+        }
+    }
+}

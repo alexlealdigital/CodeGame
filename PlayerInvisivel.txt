@@ -1,0 +1,13 @@
+public void SetPlayerInvisible()
+    {
+        int playerLayerBitmask = LayerMask.GetMask("Player");
+        if (playerLayerBitmask != 0)
+            mainCamera.cullingMask &= ~playerLayerBitmask;
+    }
+
+    public void SetPlayerVisible()
+    {
+        int playerLayerBitmask = LayerMask.GetMask("Player");
+        if (playerLayerBitmask != 0)
+            mainCamera.cullingMask |= playerLayerBitmask;
+    }

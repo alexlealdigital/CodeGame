@@ -1,0 +1,6 @@
+public float targetFOV = 75;
+public float targetFOV2 = 95;
+
+
+mainCamera.fieldOfView = targetFOV;
+mainCamera.fieldOfView = targetFOV2;
